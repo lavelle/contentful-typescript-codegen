@@ -1,49 +1,52 @@
-import { ContentType, Locale } from "contentful"
+import { ContentType } from 'contentful';
 
-import { format, resolveConfig } from "prettier"
+import { format, resolveConfig } from 'prettier';
 
-import renderContentfulImports from "./contentful/renderContentfulImports"
-import renderContentType from "./contentful/renderContentType"
-import renderUnion from "./typescript/renderUnion"
-import renderAllLocales from "./contentful/renderAllLocales"
-import renderDefaultLocale from "./contentful/renderDefaultLocale"
-import renderNamespace from "./contentful/renderNamespace"
-import renderLocalizedTypes from "./contentful/renderLocalizedTypes"
+import renderContentfulImports from './contentful/renderContentfulImports';
+import renderContentType from './contentful-fields-only/renderContentType';
+import renderNamespace from './contentful/renderNamespace';
+import _ from 'lodash';
 
 interface Options {
-  localization?: boolean
-  namespace?: string
+    namespace?: string;
 }
 
-export default async function render(
-  contentTypes: ContentType[],
-  locales: Locale[],
-  { namespace, localization = false }: Options = {},
+function renderEnum(contentTypes: ContentType[]) {
+    const out = [`export enum ContentType {`];
+
+    contentTypes.forEach((contentType) => {
+        const id = _.upperFirst(_.camelCase(contentType.sys.id));
+        out.push(`'${id}' = '${contentType.sys.id}',`);
+    });
+
+    out.push('}');
+
+    return out.join('\n');
+}
+
+export default async function renderFieldsOnly(
+    contentTypes: ContentType[],
+    { namespace }: Options = {},
 ) {
-  const sortedContentTypes = contentTypes.sort((a, b) => a.sys.id.localeCompare(b.sys.id))
-  const sortedLocales = locales.sort((a, b) => a.code.localeCompare(b.code))
+    const sortedContentTypes = contentTypes.sort((a, b) => a.sys.id.localeCompare(b.sys.id));
 
-  const typingsSource = [
-    renderAllContentTypes(sortedContentTypes, localization),
-    renderAllContentTypeIds(sortedContentTypes),
-    renderAllLocales(sortedLocales),
-    renderDefaultLocale(sortedLocales),
-    renderLocalizedTypes(localization),
-  ].join("\n\n")
+    console.log(sortedContentTypes);
 
-  const source = [
-    renderContentfulImports(localization),
-    renderNamespace(typingsSource, namespace),
-  ].join("\n\n")
+    const typingsSource = renderAllContentTypes(sortedContentTypes);
 
-  const prettierConfig = await resolveConfig(process.cwd())
-  return format(source, { ...prettierConfig, parser: "typescript" })
+    const contentTypesEnum = renderEnum(sortedContentTypes);
+
+    const source = [
+        renderContentfulImports(false),
+        contentTypesEnum,
+        renderNamespace(typingsSource, namespace),
+    ].join('\n\n');
+
+    const prettierConfig = await resolveConfig(process.cwd());
+
+    return format(source, { ...prettierConfig, parser: 'typescript' });
 }
 
-function renderAllContentTypes(contentTypes: ContentType[], localization: boolean): string {
-  return contentTypes.map(contentType => renderContentType(contentType, localization)).join("\n\n")
-}
-
-function renderAllContentTypeIds(contentTypes: ContentType[]): string {
-  return renderUnion("CONTENT_TYPE", contentTypes.map(contentType => `'${contentType.sys.id}'`))
+function renderAllContentTypes(contentTypes: ContentType[]): string {
+    return contentTypes.map((contentType) => renderContentType(contentType)).join('\n\n');
 }

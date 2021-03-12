@@ -10,3 +10,6 @@ compiled
 .rpt2_cache
 docs
 dist
+contentful.ts
+getContentfulEnvironment.js
+.env
