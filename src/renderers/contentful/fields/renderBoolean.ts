@@ -1,5 +1,5 @@
-import { Field } from "contentful"
+import { Field } from 'contentful';
 
 export default function renderBoolean(field: Field) {
-  return "boolean"
+    return 'boolean';
 }

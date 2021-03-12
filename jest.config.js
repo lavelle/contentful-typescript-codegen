@@ -1,18 +1,22 @@
 module.exports = {
-  transform: {
-    ".(ts|tsx)": "ts-jest",
-  },
-  testEnvironment: "node",
-  testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-  moduleFileExtensions: ["ts", "tsx", "js"],
-  coveragePathIgnorePatterns: ["/node_modules/", "/test/", "/src/contentful-typescript-codegen.ts"],
-  coverageThreshold: {
-    global: {
-      branches: 90,
-      functions: 95,
-      lines: 95,
-      statements: 95,
+    transform: {
+        ".(ts|tsx)": "ts-jest",
     },
-  },
-  collectCoverageFrom: ["src/**/*.{js,ts}"],
-}
+    testEnvironment: "node",
+    testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    moduleFileExtensions: ["ts", "tsx", "js"],
+    coveragePathIgnorePatterns: [
+        "/node_modules/",
+        "/test/",
+        "/src/contentful-typescript-codegen.ts",
+    ],
+    coverageThreshold: {
+        global: {
+            branches: 90,
+            functions: 95,
+            lines: 95,
+            statements: 95,
+        },
+    },
+    collectCoverageFrom: ["src/**/*.{js,ts}"],
+};
