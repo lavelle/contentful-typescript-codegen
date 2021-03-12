@@ -12,3 +12,4 @@ docs
 dist
 contentful.ts
 getContentfulEnvironment.js
+.env
